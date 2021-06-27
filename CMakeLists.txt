@@ -9,7 +9,8 @@ set(CMAKE_C_FLAGS_DEBUG "-pipe -DDEBUG -Wall -gdwarf-3 -gstrict-dwarf -O0 ${CMAK
 set(CMAKE_C_FLAGS_RELEASE "-pipe -DNDEBUG -Wall -g0 -O2 -s ${CMAKE_C_FLAGS_ALL}")
 
 
-set(SOURCE_FILES main.c)
+set(SOURCE_FILES array_unique.c
+                 main.c)
 
 
 find_library(LIB_PCAP libpcap.so)

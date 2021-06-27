@@ -10,6 +10,8 @@
 #include <netinet/tcp.h>
 #include <pcap.h>
 
+#include "array_unique.h"
+
 
 //#define VERBOSE 1
 
@@ -52,6 +54,7 @@ pcap_t* pcapfile_open(const char* fname)
 void pcapfile_do_statistic(pcap_t* pcap)
 {
     long                       count = 0l;
+    struct array_unique        sessions;
     const struct ether_header* ethernet;
     const struct iphdr*        ip;
     const struct tcphdr*       tcp;
@@ -63,10 +66,18 @@ void pcapfile_do_statistic(pcap_t* pcap)
     
     struct pcap_pkthdr         header;
     const u_char*              packet = NULL;
+    
+    if(array_unique_init(&sessions, 2) == -1) {
+        fprintf(stderr, "pcapfile_do_statistic: array_unique_init returned -1\n");
+        exit(-3);
+    }
+    
     while((packet = pcap_next(pcap, &header)) != NULL) {
         ethernet = (const struct ether_header*)(packet);
         if(ntohs(ethernet->ether_type) == ETHERTYPE_IP) {
+        #ifdef VERBOSE
             struct in_addr addr;
+        #endif
             ip = (const struct iphdr*)(packet + sizeEthernet);
         #ifdef VERBOSE
             printf("ip.id: %04x\n", ntohs(ip->id));
@@ -76,7 +87,7 @@ void pcapfile_do_statistic(pcap_t* pcap)
             printf("ip.daddr: %s\n", inet_ntoa(addr));
         #endif
             if(ip->protocol == 0x06) {
-                uint64_t hash = 0ULL;
+                uint64_t hash = 0ull;
                 tcp = (const struct tcphdr*)(packet + sizeEthernet + sizeIp);
                 payload = (const u_char*)(packet + sizeEthernet + sizeIp + sizeTcp);
             #ifdef VERBOSE
@@ -84,21 +95,23 @@ void pcapfile_do_statistic(pcap_t* pcap)
                 printf("tcp.dport: %hu\n", ntohs(tcp->th_dport));
                 printf("tcp.flags: %02x\n", tcp->th_flags);
             #endif
-                addr.s_addr = ip->saddr;
-                hash = inet_ntoa(addr);
-                addr.s_addr = ip->daddr;
-                hash += inet_ntoa(addr);
+                hash = ntohl(ip->saddr);
+                hash += ntohl(ip->daddr);
                 hash += ntohs(tcp->th_sport);
                 hash += ntohs(tcp->th_dport);
             #ifdef VERBOSE
                 printf("hash: %llu\n", hash);
             #endif
-                if(tcp->th_flags & TH_SYN) {
-                    
+                if((tcp->th_flags & (TH_SYN | TH_ACK)) == (TH_SYN | TH_ACK)) {
+                    array_unique_push(&sessions, hash);
+                } else if((tcp->th_flags & (TH_PUSH | TH_ACK)) == (TH_PUSH | TH_ACK)) {
+                    array_unique_push(&sessions, hash);
+                } else if((tcp->th_flags & (TH_URG | TH_ACK)) == (TH_URG | TH_ACK)) {
+                    array_unique_push(&sessions, hash);
                 } else if(tcp->th_flags & TH_FIN) {
-                    
+                    array_unique_erase(&sessions, hash);
                 } else if(tcp->th_flags & TH_RST) {
-                    
+                    array_unique_erase(&sessions, hash);
                 }
             } else {
                 printf("ip.protocol: %02x\n", ip->protocol);
@@ -112,6 +125,8 @@ void pcapfile_do_statistic(pcap_t* pcap)
         ++count;
     }
     printf("Total: %ld\n", count);
+    printf("Sessions: %zu\n", array_unique_size(&sessions));
+    array_unique_destroy(&sessions);
 }
 
 
