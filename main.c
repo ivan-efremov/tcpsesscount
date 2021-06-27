@@ -11,6 +11,9 @@
 #include <pcap.h>
 
 
+//#define VERBOSE 1
+
+
 /**
  * @short Открытие файла *.pcap
  * @return Хендлер pcap
@@ -65,16 +68,46 @@ void pcapfile_do_statistic(pcap_t* pcap)
         if(ntohs(ethernet->ether_type) == ETHERTYPE_IP) {
             struct in_addr addr;
             ip = (const struct iphdr*)(packet + sizeEthernet);
+        #ifdef VERBOSE
             printf("ip.id: %04x\n", ntohs(ip->id));
             addr.s_addr = ip->saddr;
             printf("ip.saddr: %s\n", inet_ntoa(addr));
             addr.s_addr = ip->daddr;
             printf("ip.daddr: %s\n", inet_ntoa(addr));
-            printf("ip.type: %02x\n", ip->protocol);
-            tcp = (const struct tcphdr*)(packet + sizeEthernet + sizeIp);
-            payload = (const u_char*)(packet + sizeEthernet + sizeIp + sizeTcp);
+        #endif
+            if(ip->protocol == 0x06) {
+                uint64_t hash = 0ULL;
+                tcp = (const struct tcphdr*)(packet + sizeEthernet + sizeIp);
+                payload = (const u_char*)(packet + sizeEthernet + sizeIp + sizeTcp);
+            #ifdef VERBOSE
+                printf("tcp.sport: %hu\n", ntohs(tcp->th_sport));
+                printf("tcp.dport: %hu\n", ntohs(tcp->th_dport));
+                printf("tcp.flags: %02x\n", tcp->th_flags);
+            #endif
+                addr.s_addr = ip->saddr;
+                hash = inet_ntoa(addr);
+                addr.s_addr = ip->daddr;
+                hash += inet_ntoa(addr);
+                hash += ntohs(tcp->th_sport);
+                hash += ntohs(tcp->th_dport);
+            #ifdef VERBOSE
+                printf("hash: %llu\n", hash);
+            #endif
+                if(tcp->th_flags & TH_SYN) {
+                    
+                } else if(tcp->th_flags & TH_FIN) {
+                    
+                } else if(tcp->th_flags & TH_RST) {
+                    
+                }
+            } else {
+                printf("ip.protocol: %02x\n", ip->protocol);
+            }
+        #ifdef VERBOSE
+            printf("===========================\n");
+        #endif
         } else {
-            printf("ether_type: %04x\n", ntohs(ethernet->ether_type));
+            printf("ethernet.ether_type: %04x\n", ntohs(ethernet->ether_type));
         }
         ++count;
     }
@@ -89,6 +122,8 @@ void pcapfile_close(pcap_t* pcap)
 {
     pcap_close(pcap);
 }
+
+
 
 
 /**
