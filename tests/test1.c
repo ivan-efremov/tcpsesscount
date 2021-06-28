@@ -28,10 +28,13 @@ void test_array_unique_push(void)
         CU_ASSERT(array_unique_push(&array, key) == 1);
     }
     CU_ASSERT(array_unique_size(&array) == 10);
+    CU_ASSERT(array_unique_push(&array, 2ul) == 0);
+    CU_ASSERT(array_unique_push(&array, 4ul) == 0);
+    CU_ASSERT(array_unique_push(&array, 6ul) == 0);
     array_unique_print(&array);
 }
 
 void test_array_unique_erase(void)
 {
-    
+    CU_ASSERT(array_unique_size(&array) == 10);
 }
