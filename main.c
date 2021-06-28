@@ -100,21 +100,43 @@ void pcapfile_do_statistic(pcap_t* pcap)
                 hash += ntohs(tcp->th_sport);
                 hash += ntohs(tcp->th_dport);
             #ifdef VERBOSE
-                printf("hash: %llu\n", hash);
+                printf("hash: %lu\n", hash);
             #endif
                 if((tcp->th_flags & (TH_SYN | TH_ACK)) == (TH_SYN | TH_ACK)) {
-                    array_unique_push(&sessions, hash);
+                    if(array_unique_push(&sessions, hash) == 1) {
+                    #ifdef VERBOSE
+                        printf("add TCP session %lu\n", hash);
+                    #endif
+                    }
                 } else if((tcp->th_flags & (TH_PUSH | TH_ACK)) == (TH_PUSH | TH_ACK)) {
-                    array_unique_push(&sessions, hash);
+                    if(array_unique_push(&sessions, hash) == 1) {
+                    #ifdef VERBOSE
+                        printf("add TCP session %lu\n", hash);
+                    #endif
+                    }
                 } else if((tcp->th_flags & (TH_URG | TH_ACK)) == (TH_URG | TH_ACK)) {
-                    array_unique_push(&sessions, hash);
+                    if(array_unique_push(&sessions, hash) == 1) {
+                    #ifdef VERBOSE
+                        printf("add TCP session %lu\n", hash);
+                    #endif
+                    }
                 } else if(tcp->th_flags & TH_FIN) {
-                    array_unique_erase(&sessions, hash);
+                    if(array_unique_erase(&sessions, hash) == 1) {
+                    #ifdef VERBOSE
+                        printf("delete TCP session %lu\n", hash);
+                    #endif
+                    }
                 } else if(tcp->th_flags & TH_RST) {
-                    array_unique_erase(&sessions, hash);
+                    if(array_unique_erase(&sessions, hash) == 1) {
+                    #ifdef VERBOSE
+                        printf("delete TCP session %lu\n", hash);
+                    #endif
+                    }
                 }
             } else {
+            #ifdef VERBOSE
                 printf("ip.protocol: %02x\n", ip->protocol);
+            #endif
             }
         #ifdef VERBOSE
             printf("===========================\n");

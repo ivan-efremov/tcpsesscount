@@ -83,9 +83,9 @@ int array_unique_erase(struct array_unique* array, uint64_t i64)
         memcpy(array->data + i, array->data + i + 1ul, (array->size - i - 1) * sizeof(uint64_t));
         array->size -= 1;
         *(array->data + array->size) = 0ul;
-        return 0;
+        return 1;
     }
-    return -1;
+    return 0;
 }
 
 uint64_t array_unique_get(struct array_unique* array, int index)
