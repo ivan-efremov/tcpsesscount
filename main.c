@@ -54,6 +54,8 @@ pcap_t* pcapfile_open(const char* fname)
 void pcapfile_do_statistic(pcap_t* pcap)
 {
     long                       count = 0l;
+    long                       countFin = 0l;
+    long                       countRst = 0l;
     struct array_unique        sessions;
     const struct ether_header* ethernet;
     const struct iphdr*        ip;
@@ -93,7 +95,7 @@ void pcapfile_do_statistic(pcap_t* pcap)
             #ifdef VERBOSE
                 printf("tcp.sport: %hu\n", ntohs(tcp->th_sport));
                 printf("tcp.dport: %hu\n", ntohs(tcp->th_dport));
-                printf("tcp.flags: %02x\n", tcp->th_flags);
+                printf("tcp.flags: 0x%02x\n", tcp->th_flags);
             #endif
                 hash = ntohl(ip->saddr);
                 hash += ntohl(ip->daddr);
@@ -122,12 +124,14 @@ void pcapfile_do_statistic(pcap_t* pcap)
                     }
                 } else if(tcp->th_flags & TH_FIN) {
                     if(array_unique_erase(&sessions, hash) == 1) {
+                        ++countFin;
                     #ifdef VERBOSE
                         printf("delete TCP session %lu\n", hash);
                     #endif
                     }
                 } else if(tcp->th_flags & TH_RST) {
                     if(array_unique_erase(&sessions, hash) == 1) {
+                        ++countRst;
                     #ifdef VERBOSE
                         printf("delete TCP session %lu\n", hash);
                     #endif
@@ -142,12 +146,16 @@ void pcapfile_do_statistic(pcap_t* pcap)
             printf("===========================\n");
         #endif
         } else {
+        #ifdef VERBOSE
             printf("ethernet.ether_type: %04x\n", ntohs(ethernet->ether_type));
+        #endif
         }
         ++count;
     }
-    printf("Total: %ld\n", count);
-    printf("Sessions: %zu\n", array_unique_size(&sessions));
+    printf("Total packages: %ld\n", count);
+    printf("Sessions active: %zu\n", array_unique_size(&sessions));
+    printf("Sessions terminated success: %ld\n", countFin);
+    printf("Sessions disconnected: %ld\n", countRst);
     array_unique_destroy(&sessions);
 }
 

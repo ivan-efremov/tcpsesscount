@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2.2)
 
-project(tcpsesscount)
+project(tests)
 
 set(CMAKE_C_STANDARD 11)
 
@@ -9,14 +9,11 @@ set(CMAKE_C_FLAGS_DEBUG "-pipe -DDEBUG -Wall -gdwarf-3 -gstrict-dwarf -O0 ${CMAK
 set(CMAKE_C_FLAGS_RELEASE "-pipe -DNDEBUG -Wall -g0 -O2 -s ${CMAKE_C_FLAGS_ALL}")
 
 
-set(SOURCE_FILES array_unique.c
-                 main.c)
+include_directories("${CMAKE_SOURCE_DIR}")
 
 
-find_library(LIB_PCAP libpcap.so)
+find_library(LIB_CUNIT libcunit.so)
 
-add_executable(tcpsesscount ${SOURCE_FILES})
+add_executable(tests ../array_unique.c test1.c main.c)
 
-target_link_libraries(tcpsesscount ${LIB_PCAP})
-
-add_subdirectory(tests)
+target_link_libraries(tests ${LIB_CUNIT})
