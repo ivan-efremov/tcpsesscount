@@ -87,7 +87,7 @@ void pcapfile_do_statistic(pcap_t* pcap)
             printf("ip.daddr: %s\n", inet_ntoa(addr));
         #endif
             if(ip->protocol == 0x06) {
-                uint64_t hash = 0ull;
+                uint64_t hash = 0ul;
                 tcp = (const struct tcphdr*)(packet + sizeEthernet + sizeIp);
                 payload = (const u_char*)(packet + sizeEthernet + sizeIp + sizeTcp);
             #ifdef VERBOSE
@@ -137,7 +137,6 @@ void pcapfile_close(pcap_t* pcap)
 {
     pcap_close(pcap);
 }
-
 
 
 
