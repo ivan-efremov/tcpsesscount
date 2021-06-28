@@ -153,9 +153,9 @@ void pcapfile_do_statistic(pcap_t* pcap)
         ++count;
     }
     printf("Total packages: %ld\n", count);
-    printf("Sessions active: %zu\n", array_unique_size(&sessions));
-    printf("Sessions terminated success: %ld\n", countFin);
-    printf("Sessions disconnected: %ld\n", countRst);
+    printf("TCP sessions active: %zu\n", array_unique_size(&sessions));
+    printf("TCP sessions terminated success: %ld\n", countFin);
+    printf("TCP sessions disconnected: %ld\n", countRst);
     array_unique_destroy(&sessions);
 }
 
@@ -179,7 +179,7 @@ int main(int argc, const char** argv)
 {
     pcap_t* pcap = NULL;
     if(argc != 2) {
-        printf("Usage:\n\t%s dump.pcap\n", argv[0]);
+        printf("Usage:\n\t%s dump.pcap\n\n", argv[0]);
         exit(-1);
     }
     pcap = pcapfile_open(argv[1]);
