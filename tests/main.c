@@ -9,10 +9,10 @@
 /**
  * @short Тест1
  */
-extern int  initSuite1(void);
-extern int  cleanSuite1(void);
-extern void testArrayUniquePush(void);
-extern void testArrayUniqueErase(void);
+extern int  init_suite1(void);
+extern int  cleanup_suite1(void);
+extern void test_array_unique_push(void);
+extern void test_array_unique_erase(void);
 
 
 
@@ -24,14 +24,14 @@ int main()
         return CU_get_error();
     }
 
-    pSuite = CU_add_suite("suite1", initSuite1, cleanSuite1);
+    pSuite = CU_add_suite("suite1", init_suite1, cleanup_suite1);
     if(pSuite == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
 
-    if((CU_add_test(pSuite, "test of array_unique_push()", testArrayUniquePush) == NULL) ||
-       (CU_add_test(pSuite, "test of array_unique_erase()", testArrayUniqueErase) == NULL))
+    if((CU_add_test(pSuite, "test of array_unique_push()", test_array_unique_push) == NULL) ||
+       (CU_add_test(pSuite, "test of array_unique_erase()", test_array_unique_erase) == NULL))
     {
         CU_cleanup_registry();
         return CU_get_error();

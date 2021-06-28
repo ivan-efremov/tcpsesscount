@@ -10,23 +10,28 @@
 static struct array_unique array;
 
 
-int initSuite1(void)
+int init_suite1(void)
 {
     return array_unique_init(&array, 4);
 }
 
-int cleanSuite1(void)
+int cleanup_suite1(void)
 {
     array_unique_destroy(&array);
     return 0;
 }
 
-void testArrayUniquePush(void)
+void test_array_unique_push(void)
 {
-
+    uint64_t key = 0ul;
+    for(key = 0ul; key < 20ul; key += 2) {
+        CU_ASSERT(array_unique_push(&array, key) == 1);
+    }
+    CU_ASSERT(array_unique_size(&array) == 10);
+    array_unique_print(&array);
 }
 
-void testArrayUniqueErase(void)
+void test_array_unique_erase(void)
 {
-
+    
 }
