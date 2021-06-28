@@ -69,7 +69,7 @@ void pcapfile_do_statistic(pcap_t* pcap)
     struct pcap_pkthdr         header;
     const u_char*              packet = NULL;
     
-    if(array_unique_init(&sessions, 2) == -1) {
+    if(array_unique_init(&sessions, 1000) == -1) {
         fprintf(stderr, "pcapfile_do_statistic: array_unique_init returned -1\n");
         exit(-3);
     }

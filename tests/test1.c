@@ -37,4 +37,8 @@ void test_array_unique_push(void)
 void test_array_unique_erase(void)
 {
     CU_ASSERT(array_unique_size(&array) == 10);
+    CU_ASSERT(array_unique_get(&array, 1) == 2ul);
+    CU_ASSERT(array_unique_erase(&array, 2ul) == 1);
+    CU_ASSERT(array_unique_erase(&array, 4ul) == 1);
+    CU_ASSERT(array_unique_erase(&array, 5ul) == 0);
 }
