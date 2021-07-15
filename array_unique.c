@@ -54,11 +54,13 @@ int array_unique_push(struct array_unique* array, uint64_t i64)
 {
     size_t i;
     if(array->nalloc < (array->size + 1ul)) {
-        array->nalloc *= 2ul;
-        array->data = realloc(array->data, sizeof(uint64_t) * array->nalloc);
-        if(array->data == NULL) {
+        size_t newSize = array->nalloc << 1;
+        uint64_t* pData = realloc(array->data, sizeof(uint64_t) * newSize);
+        if(pData == NULL) {
             return -1;
         }
+        array->data = pData;
+        array->nalloc = newSize;
     }
     i = array_unique_lower_bound(array, i64);
     while((i < array->size) && (i64 > *(array->data + i))) ++i;
@@ -88,7 +90,7 @@ int array_unique_erase(struct array_unique* array, uint64_t i64)
 
 uint64_t array_unique_get(struct array_unique* array, int index)
 {
-    return ((size_t)index < array->size) ? *(array->data + (size_t)index) : 0ul;
+    return ((size_t)index < array->size) ? *(array->data + (size_t)index) : ~0ul;
 }
 
 void array_unique_print(struct array_unique* array)
