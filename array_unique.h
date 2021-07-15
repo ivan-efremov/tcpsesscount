@@ -16,6 +16,7 @@ struct array_unique {
     size_t    nalloc;
 };
 
+#define ARRAY_ITEM_NOT_FOUND (~0ULL)
 
 /**
  * @short Методы массива.

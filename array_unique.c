@@ -90,7 +90,7 @@ int array_unique_erase(struct array_unique* array, uint64_t i64)
 
 uint64_t array_unique_get(struct array_unique* array, int index)
 {
-    return ((size_t)index < array->size) ? *(array->data + (size_t)index) : ~0ul;
+    return ((size_t)index < array->size) ? *(array->data + (size_t)index) : ARRAY_ITEM_NOT_FOUND;
 }
 
 void array_unique_print(struct array_unique* array)
